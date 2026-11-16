@@ -9,7 +9,7 @@ Understand how spark works internally using pysaprk
 ## Setup:
 - Once all requirements are installed, Pull the repository:
 ```bash
-git clone https://github.com/LearnBe4/spark-internals.git
+git clone https://github.com/karthick180887/spark-internals.git
 ```
 - Run the following command to install the dependencies and bring up the docker container:
 ```bash
