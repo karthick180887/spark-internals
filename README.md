@@ -4,7 +4,7 @@ Understand how spark works internally using pysaprk
 ## Pre-requisites
 1. [Install Docker](https://docs.docker.com/desktop/)
 2. [Install Python](https://www.python.org/downloads/)
-3. [Install Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
+3. [Install uv](https://docs.astral.sh/uv/getting-started/installation/) (optional for local development)
 
 ## Setup:
 - Once all requirements are installed, Pull the repository:
@@ -13,15 +13,15 @@ git clone https://github.com/karthick180887/spark-internals.git
 ```
 - Run the following command to install the dependencies and bring up the docker container:
 ```bash
-poetry install
+uv sync
 docker compose up
 ```
 
 ## Web UIs
-- The Jupyter Notebook: `localhost:8080`
+- The Jupyter Notebook: `localhost:8888`
   - Token: jupyter
 - Spark UI: `localhost:4040`
-- Spark Master Node: `localhost:9090`
+- Spark Master Node: `localhost:8088`
 - Spark History Server: `localhost:18080`
 
 ### Datasets:

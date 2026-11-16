@@ -1,6 +1,6 @@
-FROM python:3.12-bullseye AS spark-base
+FROM python:3.12-bookworm AS spark-base
 
-ARG SPARK_VERSION=3.5.0
+ARG SPARK_VERSION=3.5.5
 
 # Install tools required by the OS
 RUN apt-get update && \
@@ -10,7 +10,7 @@ RUN apt-get update && \
       vim \
       unzip \
       rsync \
-      openjdk-11-jdk \
+      openjdk-17-jdk-headless \
       build-essential \
       software-properties-common \
       ssh && \
@@ -25,8 +25,8 @@ RUN mkdir -p ${HADOOP_HOME} && mkdir -p ${SPARK_HOME}
 WORKDIR ${SPARK_HOME}
 
 # Download and install Spark
-RUN curl https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -o spark-${SPARK_VERSION}-bin-hadoop3.tgz \
- && tar xvzf spark-${SPARK_VERSION}-bin-hadoop3.tgz --directory /opt/spark --strip-components 1 \
+RUN curl -fL --retry 3 https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -o spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+ && tar xzf spark-${SPARK_VERSION}-bin-hadoop3.tgz --directory /opt/spark --strip-components 1 \
  && rm -rf spark-${SPARK_VERSION}-bin-hadoop3.tgz
 
 FROM spark-base AS pyspark
@@ -38,7 +38,7 @@ ENV UV_LINK_MODE=copy
 
 # Install python deps
 COPY pyproject.toml uv.lock ./
-RUN uv sync --no-install-project
+RUN uv sync --frozen --no-install-project
 
 # Copy logging configuration
 COPY conf/log4j.properties "$SPARK_HOME/conf"
@@ -47,7 +47,7 @@ COPY conf/log4j.properties "$SPARK_HOME/conf"
 COPY conf/spark-defaults.conf "$SPARK_HOME/conf"
 
 # Setup Spark related environment variables
-ENV PATH="/opt/spark/sbin:/opt/spark/bin:${PATH}"
+ENV PATH="/opt/spark/.venv/bin:/opt/spark/sbin:/opt/spark/bin:${PATH}"
 ENV SPARK_MASTER="spark://spark-master:7077"
 ENV SPARK_MASTER_HOST=spark-master
 ENV SPARK_MASTER_PORT=7077
@@ -67,6 +67,6 @@ WORKDIR ${SPARK_HOME}/python
 
 # Copy appropriate entrypoint script
 COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -7,7 +7,7 @@ authors = [
     {name = "Rajesh Kumar",email = "rajesh.kumar@learnbe4.in"}
 ]
 
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 readme = "README.md"
 
 dependencies = [

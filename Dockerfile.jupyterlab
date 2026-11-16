@@ -3,10 +3,7 @@
 FROM spark-image
 
 # Install Jupyter and related components
-RUN pip install --no-cache-dir jupyterlab==3.5.0 \
-    && pip install findspark \
-    && pip install delta-spark==3.2.0 \
-    && pip install boto3
+RUN uv pip install --python /opt/spark/.venv/bin/python jupyterlab==3.5.0 findspark boto3
 
 # Create the necessary directory structure for the initialization script
 RUN mkdir -p /root/.ipython/profile_default/startup
@@ -16,10 +13,10 @@ RUN echo "import findspark; findspark.init()" >> /root/.ipython/profile_default/
 
 # Set up environment variables for JupyterLab
 ENV JUPYTER_PORT="8888"
-ENV JUPYTER_TOKEN=""
+
 
 # Copy the customized entrypoint script if needed
 COPY entrypoint-jupyter.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint-jupyter.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint-jupyter.sh && chmod +x /usr/local/bin/entrypoint-jupyter.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint-jupyter.sh"]

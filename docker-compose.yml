@@ -3,6 +3,7 @@ services:
     container_name: spark-master
     build: .
     image: spark-image
+    pull_policy: never
     command: master
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
@@ -22,6 +23,7 @@ services:
   spark-history-server:
     container_name: spark-history
     image: spark-image
+    pull_policy: never
     command: history
     depends_on:
       - spark-master
@@ -35,6 +37,7 @@ services:
   spark-worker:
 #    container_name: spark-worker
     image: spark-image
+    pull_policy: never
     command: worker
     restart: unless-stopped
     depends_on:
@@ -56,7 +59,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.jupyterlab
+      additional_contexts:
+        spark-image: service:spark-master
     image: jupyter_lab
+    pull_policy: never
     restart: unless-stopped
     depends_on:
       - spark-master
